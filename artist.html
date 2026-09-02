@@ -213,73 +213,12 @@
             aspect-ratio: 16/10;
             object-fit: cover;
         }
-
-        /* CATALOGO DESPLEGABLE */
-        .catalogo-desplegable {
-            max-width: 1000px;
-            margin: 0 auto 5rem;
+        .featured-wide {
+            grid-column: span 2;
         }
-        .catalogo-toggle {
-            font-size: 0.85rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            color: var(--orange);
-            cursor: pointer;
-            padding: 1rem 1.5rem;
-            border: 2px solid var(--orange);
-            background: rgba(17, 17, 17, 0.9);
-            text-align: center;
-            transition: all 0.3s;
-            display: block;
-        }
-        .catalogo-toggle::-webkit-details-marker { display: none; }
-        .catalogo-toggle::marker { display: none; content: ''; }
-        .catalogo-toggle::before {
-            content: '+ ';
-            font-weight: 700;
-            color: var(--orange);
-        }
-        .catalogo-desplegable[open] .catalogo-toggle::before {
-            content: '- ';
-        }
-        .catalogo-toggle:hover { background: var(--orange); color: var(--black); }
-        .catalogo-chaotic {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1.5rem;
-            padding: 2rem 0;
-            justify-content: center;
-            align-items: flex-start;
-        }
-        .c-obra { width: 40%; transform: rotate(-2deg); border-color: var(--orange); }
-        .c-ignorance { width: 35%; transform: rotate(3deg); border-color: var(--red); }
-        .c1 { width: 28%; transform: rotate(-3deg); border-color: var(--red); }
-        .c2 { width: 22%; transform: rotate(2deg); margin-top: 3rem; border-color: var(--green); }
-        .c3 { width: 32%; transform: rotate(-1.5deg); border-color: var(--blue); }
-        .c4 { width: 18%; transform: rotate(4deg); margin-top: -1rem; border-color: var(--orange); }
-        .c5 { width: 26%; transform: rotate(-2.5deg); margin-top: 2rem; border-color: var(--red); }
-        .c6 { width: 35%; transform: rotate(1deg); border-color: var(--green); }
-        .c7 { width: 20%; transform: rotate(-4deg); margin-top: 4rem; border-color: var(--blue); }
-        .c8 { width: 30%; transform: rotate(3deg); border-color: var(--orange); }
-        .c9 { width: 24%; transform: rotate(-1deg); margin-top: -2rem; border-color: var(--red); }
-        .c10 { width: 28%; transform: rotate(2.5deg); margin-top: 1rem; border-color: var(--green); }
-        .c11 { width: 22%; transform: rotate(-3.5deg); border-color: var(--blue); }
-
-        .c-img {
-            display: block;
-            border: 3px solid var(--black);
-            background: #000;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-            cursor: pointer;
-            outline: none;
-        }
-        .c-img:focus, .c-img.active {
-            transform: rotate(0deg) !important;
-            box-shadow: 0 0 25px rgba(255, 183, 0, 0.6);
-            border-color: var(--orange) !important;
-            z-index: 10;
-            position: relative;
+        .featured-wide img {
+            aspect-ratio: 21/9;
+            object-fit: cover;
         }
 
         /* CONTACT */
@@ -331,8 +270,8 @@
         @media (max-width: 768px) {
             .bio { grid-template-columns: 1fr; }
             .featured-grid { grid-template-columns: 1fr; }
+            .featured-wide { grid-column: span 1; }
             .content { padding: 3rem 1.5rem; }
-            .c-img { width: 45% !important; }
             body { font-size: 0.9rem; }
             .back-link { padding: 0.75rem 0.5rem; }
         }
@@ -508,27 +447,10 @@
                     <div class="featured-item">
                         <img src="presentacion/contemporaneo (2).jpg" alt="Contemporáneo II">
                     </div>
-                </div>
-
-                <!-- CATÁLOGO DESPLEGABLE -->
-                <details class="catalogo-desplegable">
-                    <summary class="catalogo-toggle">Ver Catálogo Completo</summary>
-                    <div class="catalogo-chaotic">
-                        <img src="presentacion/obra.jpg" alt="" class="c-img c-obra" tabindex="0">
-                        <img src="presentacion/ignorance.jpg" alt="" class="c-img c-ignorance" tabindex="0">
-                        <img src="presentacion/_MG_1912-14.png" alt="" class="c-img c1" tabindex="0">
-                        <img src="presentacion/_MG_1892-1C.png" alt="" class="c-img c2" tabindex="0">
-                        <img src="presentacion/_MG_1911-13.png" alt="" class="c-img c3" tabindex="0">
-                        <img src="presentacion/_MG_1908-10.png" alt="" class="c-img c4" tabindex="0">
-                        <img src="presentacion/_MG_1906-9.png" alt="" class="c-img c5" tabindex="0">
-                        <img src="presentacion/_MG_1905-8C.png" alt="" class="c-img c6" tabindex="0">
-                        <img src="presentacion/_MG_1904-7.png" alt="" class="c-img c7" tabindex="0">
-                        <img src="presentacion/_MG_1903-6.png" alt="" class="c-img c8" tabindex="0">
-                        <img src="presentacion/_MG_1896-4.png" alt="" class="c-img c9" tabindex="0">
-                        <img src="presentacion/_MG_1895-3.png" alt="" class="c-img c10" tabindex="0">
-                        <img src="presentacion/_MG_1893-2.png" alt="" class="c-img c11" tabindex="0">
+                    <div class="featured-item featured-wide">
+                        <img src="presentacion/obra.jpg" alt="Composición en Negro">
                     </div>
-                </details>
+                </div>
 
                 <!-- CONTACTO -->
                 <section class="contact">
@@ -577,31 +499,6 @@
             showContent();
         } else {
             setTimeout(showContent, 1500);
-        }
-    })();
-    </script>
-
-    <script>
-    (function() {
-        var imgs = document.querySelectorAll('.c-img');
-        imgs.forEach(function(img) {
-            img.addEventListener('click', function() {
-                imgs.forEach(function(i) { i.classList.remove('active'); });
-                this.classList.add('active');
-            });
-        });
-    })();
-    </script>
-
-    <script>
-    (function() {
-        var toggle = document.querySelector('.catalogo-toggle');
-        var details = document.querySelector('.catalogo-desplegable');
-        if (toggle && details) {
-            toggle.addEventListener('click', function(e) {
-                e.preventDefault();
-                details.open = !details.open;
-            });
         }
     })();
     </script>
