@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canaem Briceño</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Grotesk', sans-serif; background: #fff; overflow: hidden; height: 100vh; width: 100vw; }
+
+        /* ===== PRELOADER ===== */
+        #preloader {
+            position: fixed; inset: 0;
+            background: #fff;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 100;
+            transition: opacity 0.8s ease;
+        }
+        #preloader.hide { opacity: 0; pointer-events: none; }
+
+        /* ===== MONDRIAN GRID ===== */
+        .mondrian {
+            position: relative;
+            width: 80vmin; height: 80vmin;
+            max-width: 500px; max-height: 500px;
+            background: #F0F0F0;
+            border: 10px solid #1A1A1A;
+        }
+
+        /* LINES */
+        .line {
+            position: absolute;
+            background: #1A1A1A;
+        }
+        .line-h {
+            left: 0; right: 0; height: 8px;
+            transform: scaleX(0);
+            transform-origin: left;
+        }
+        .line-v {
+            top: 0; bottom: 0; width: 8px;
+            transform: scaleY(0);
+            transform-origin: top;
+        }
+
+        /* LINE ANIMATIONS */
+        @keyframes growX { to { transform: scaleX(1); } }
+        @keyframes growY { to { transform: scaleY(1); } }
+
+        .line-h { animation: growX 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        .line-v { animation: growY 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+
+        /* LINE POSITIONS & DELAYS */
+        .l-h1 { top: 60px; animation-delay: 0s; }
+        .l-h2 { top: 150px; animation-delay: 0.12s; }
+        .l-h3 { top: 240px; animation-delay: 0.24s; }
+        .l-h4 { top: 370px; animation-delay: 0.36s; }
+        .l-h5 { top: 470px; animation-delay: 0.48s; }
+
+        .l-v1 { left: 45px; animation-delay: 0.6s; }
+        .l-v2 { left: 170px; animation-delay: 0.72s; }
+        .l-v3 { left: 250px; animation-delay: 0.84s; }
+        .l-v4 { left: 340px; animation-delay: 0.96s; }
+
+        /* BLOCKS */
+        .block {
+            position: absolute;
+            transform: scale(0);
+            opacity: 0;
+        }
+        @keyframes pop {
+            0% { transform: scale(0); opacity: 0; }
+            70% { transform: scale(1.04); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .block.show { animation: pop 0.6s cubic-bezier(0.34, 1.08, 0.64, 1) forwards; }
+
+        /* BLOCK POSITIONS */
+        .b1 { left: 45px; top: 60px; width: 125px; height: 180px; background: #E62117; }
+        .b2 { left: 170px; top: 60px; width: 80px; height: 90px; background: #FCD116; }
+        .b3 { left: 250px; top: 35px; width: 90px; height: 75px; background: #1D82BE; }
+        .b4 { left: 340px; top: 150px; width: 80px; height: 90px; background: #111; }
+        .b5 { left: 250px; top: 110px; width: 90px; height: 80px; background: #E62117; }
+        .b6 { left: 250px; top: 240px; width: 90px; height: 130px; background: #FCD116; }
+        .b7 { left: 170px; top: 240px; width: 80px; height: 130px; background: #1D82BE; }
+        .b8 { left: 45px; top: 240px; width: 55px; height: 180px; background: #FCD116; }
+        .b9 { left: 170px; top: 370px; width: 100px; height: 100px; background: #E62117; }
+        .b10 { left: 340px; top: 240px; width: 160px; height: 230px; background: #1D82BE; }
+        .b11 { left: 45px; top: 420px; width: 125px; height: 50px; background: #111; }
+        .b12 { left: 215px; top: 420px; width: 55px; height: 50px; background: #111; }
+
+        /* ===== BANDAS ===== */
+        .preband {
+            position: fixed; inset: 0;
+            pointer-events: none; z-index: 200;
+        }
+        .band {
+            position: absolute; top: 0; bottom: 0;
+            width: 25%;
+            background: #fff;
+            border-right: 1px solid #eee;
+            display: flex; align-items: center; justify-content: center;
+            font-size: min(10vw, 18vh);
+            font-weight: 700;
+            color: #111;
+            transform: translateY(101%);
+        }
+        .band:nth-child(1) { left: 0; }
+        .band:nth-child(2) { left: 25%; }
+        .band:nth-child(3) { left: 50%; }
+        .band:nth-child(4) { left: 75%; border-right: none; }
+
+        /* ===== MAIN CONTENT ===== */
+        #main {
+            position: fixed; inset: 0;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            background: #fff;
+            visibility: hidden; opacity: 0;
+            text-align: center; padding: 2rem;
+            z-index: 50;
+        }
+        #main.show { visibility: visible; opacity: 1; transition: opacity 0.6s ease; }
+        #main h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700; line-height: 1.1;
+            margin-bottom: 1rem; color: #111;
+        }
+        #main h1 em { font-style: normal; color: #E62117; }
+        #main p {
+            font-size: 1rem; color: #666;
+            max-width: 460px; line-height: 1.7;
+            margin-bottom: 2.5rem;
+        }
+        .cta {
+            display: inline-flex; align-items: center; gap: 0.75rem;
+            padding: 1rem 2.5rem;
+            background: #111; color: #fff;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.8rem; font-weight: 600;
+            letter-spacing: 0.15em; text-transform: uppercase;
+            text-decoration: none; border: none; cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+        }
+        .cta:hover { background: #E62117; }
+        .cta:active { transform: scale(0.97); }
+
+        /* CORNERS */
+        .corner {
+            position: fixed; width: 36px; height: 36px;
+            opacity: 0; transition: opacity 0.6s ease; z-index: 60;
+        }
+        .corner.vis { opacity: 0.2; }
+        .c-tl { top: 1.5rem; left: 1.5rem; border-top: 2px solid #111; border-left: 2px solid #111; }
+        .c-tr { top: 1.5rem; right: 1.5rem; border-top: 2px solid #111; border-right: 2px solid #111; }
+        .c-bl { bottom: 1.5rem; left: 1.5rem; border-bottom: 2px solid #111; border-left: 2px solid #111; }
+        .c-br { bottom: 1.5rem; right: 1.5rem; border-bottom: 2px solid #111; border-right: 2px solid #111; }
+
+        .watermark {
+            position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%);
+            font-size: 0.65rem; font-weight: 600; letter-spacing: 0.2em;
+            text-transform: uppercase; color: #ccc;
+            opacity: 0; transition: opacity 0.6s ease; z-index: 60;
+        }
+        .watermark.vis { opacity: 1; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .line-h, .line-v, .block { animation: none !important; transform: none !important; opacity: 1 !important; }
+            .band { transition: none !important; transform: translateY(0) !important; }
+        }
+
+        /* NO-REPLAY (skip animations on return) */
+        .no-anim .line-h,
+        .no-anim .line-v,
+        .no-anim .block {
+            animation: none !important;
+            transform: none !important;
+            opacity: 1 !important;
+        }
+        .no-anim .band {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<!-- PRELOADER -->
+<div id="preloader">
+    <div class="mondrian">
+        <!-- Lines -->
+        <div class="line line-h l-h1"></div>
+        <div class="line line-h l-h2"></div>
+        <div class="line line-h l-h3"></div>
+        <div class="line line-h l-h4"></div>
+        <div class="line line-h l-h5"></div>
+        <div class="line line-v l-v1"></div>
+        <div class="line line-v l-v2"></div>
+        <div class="line line-v l-v3"></div>
+        <div class="line line-v l-v4"></div>
+        <!-- Blocks -->
+        <div class="block b1"></div>
+        <div class="block b2"></div>
+        <div class="block b3"></div>
+        <div class="block b4"></div>
+        <div class="block b5"></div>
+        <div class="block b6"></div>
+        <div class="block b7"></div>
+        <div class="block b8"></div>
+        <div class="block b9"></div>
+        <div class="block b10"></div>
+        <div class="block b11"></div>
+        <div class="block b12"></div>
+    </div>
+</div>
+
+<!-- BANDAS -->
+<div class="preband">
+    <div class="band">C</div>
+    <div class="band">·</div>
+    <div class="band">B</div>
+    <div class="band">·</div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+    <h1>Canaem <em>Briceño</em></h1>
+    <p>Propuesta artística para evento aniversario. Pintura en vivo e experiencia inmersiva interactiva.</p>
+    <a href="index.html" class="cta">Ver Propuesta</a>
+</div>
+
+<div class="watermark">Canaem Briceño</div>
+<div class="corner c-tl"></div>
+<div class="corner c-tr"></div>
+<div class="corner c-bl"></div>
+<div class="corner c-br"></div>
+
+<script>
+(function(){
+    var played = sessionStorage.getItem('anim_intro');
+    var preloader = document.getElementById('preloader');
+    var main = document.getElementById('main');
+    var bands = document.querySelectorAll('.band');
+    var blocks = document.querySelectorAll('.block');
+
+    function showAll() {
+        preloader.classList.add('hide');
+        main.classList.add('show');
+        document.querySelectorAll('.corner,.watermark').forEach(function(el){
+            el.classList.add('vis');
+        });
+    }
+
+    if (played) {
+        document.documentElement.classList.add('no-anim');
+        showAll();
+        return;
+    }
+
+    window.addEventListener('pageshow', function(e) {
+        if (e.persisted) {
+            document.documentElement.classList.add('no-anim');
+            showAll();
+        }
+    });
+
+    // Fase 2: Blocks appear (after lines finish at ~1s)
+    var blockDelays = [1100,1200,1300,1400,1500,1600,1700,1800,1900,2000,2100,2200];
+    blocks.forEach(function(b, i){
+        setTimeout(function(){ b.classList.add('show'); }, blockDelays[i]);
+    });
+
+    // Fase 3: Mondrian fades out
+    setTimeout(function(){
+        preloader.classList.add('hide');
+    }, 3200);
+
+    // Fase 4: Bands slide in (stagger)
+    setTimeout(function(){
+        bands.forEach(function(b, i){
+            setTimeout(function(){
+                b.style.transition = 'transform 0.9s cubic-bezier(.77,.2,.05,1)';
+                b.style.transform = 'translateY(0)';
+            }, i * 130);
+        });
+    }, 3600);
+
+    // Fase 5: Bands slide out (stagger)
+    setTimeout(function(){
+        bands.forEach(function(b, i){
+            setTimeout(function(){
+                b.style.transition = 'transform 0.9s cubic-bezier(.65,0,.35,1)';
+                b.style.transform = 'translateY(-101%)';
+            }, i * 120);
+        });
+    }, 5200);
+
+    // Fase 6: Show content
+    setTimeout(function(){
+        main.classList.add('show');
+        document.querySelectorAll('.corner,.watermark').forEach(function(el){
+            el.classList.add('vis');
+        });
+        sessionStorage.setItem('anim_intro', '1');
+    }, 6400);
+
+})();
+</script>
+</body>
+</html>

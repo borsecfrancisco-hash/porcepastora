@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experiencia Interactiva | Canaem Briceño</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --red: #E63946;
+            --blue: #1D3557;
+            --yellow: #F4D35E;
+            --black: #0D0D0D;
+            --white: #FAFAFA;
+            --line: 4px;
+        }
+        body { font-family: 'Space Grotesk', sans-serif; background: var(--black); overflow-x: hidden; color: var(--black); }
+
+        /* MONDRIAN BACKGROUND */
+        .mondrian-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 1;
+            background: #f0f0f0;
+        }
+        .mondrian-bg svg {
+            width: 100%; height: 100%;
+        }
+
+        /* MONDRIAN ANIMATIONS */
+        @keyframes slideInX {
+            0% { transform: translateX(-100%); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideInY {
+            0% { transform: translateY(-100%); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes fadeInScale {
+            0% { transform: scale(0); opacity: 0; }
+            70% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .line-h {
+            animation: slideInX 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+        }
+        .line-v {
+            animation: slideInY 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+        }
+        .color-box {
+            transform-origin: center;
+            animation: fadeInScale 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            opacity: 0;
+        }
+
+        /* DELAYS */
+        #h1 { animation-delay: 0.1s; }
+        #h2 { animation-delay: 0.2s; }
+        #h3 { animation-delay: 0.3s; }
+        #h4 { animation-delay: 0.4s; }
+        #h5 { animation-delay: 0.5s; }
+        #v1 { animation-delay: 0.6s; }
+        #v2 { animation-delay: 0.7s; }
+        #v3 { animation-delay: 0.8s; }
+        #v4 { animation-delay: 0.9s; }
+        #box-red-1 { animation-delay: 1.2s; }
+        #box-yellow-1 { animation-delay: 1.4s; }
+        #box-blue-1 { animation-delay: 1.6s; }
+        #box-black-1 { animation-delay: 1.8s; }
+        #box-red-2 { animation-delay: 2.0s; }
+        #box-yellow-2 { animation-delay: 2.2s; }
+        #box-blue-2 { animation-delay: 2.4s; }
+        #box-black-2 { animation-delay: 2.6s; }
+        #box-red-3 { animation-delay: 2.8s; }
+        #box-yellow-3 { animation-delay: 3.0s; }
+        #box-blue-3 { animation-delay: 3.2s; }
+        #box-black-3 { animation-delay: 3.4s; }
+
+        /* NO-REPLAY (skip animations on return) */
+        .no-anim .line-h,
+        .no-anim .line-v,
+        .no-anim .color-box {
+            animation: none !important;
+            opacity: 1 !important;
+        }
+
+        /* CONTENT OVERLAY */
+        .content-overlay {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            background: rgba(250, 250, 250, 0.85);
+            backdrop-filter: blur(2px);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .content-overlay.is-visible {
+            opacity: 1;
+        }
+
+        /* HEADER */
+        .header {
+            display: grid;
+            grid-template-columns: 80px 1fr 80px;
+            gap: var(--line);
+        }
+        .header-l, .header-r {
+            background: var(--yellow);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; font-weight: 700; color: var(--black); opacity: 0.4;
+        }
+        .header-r { background: var(--red); }
+        .header-mid {
+            background: rgba(250, 250, 250, 0.9);
+            border-bottom: var(--line) solid var(--black);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.5rem 2.5rem;
+        }
+        .logo { font-size: 0.85rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; }
+        .back { font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: #aaa; text-decoration: none; transition: color 0.3s; }
+        .back:hover { color: var(--black); }
+
+        /* MAIN */
+        .main {
+            display: grid;
+            grid-template-columns: 80px 1fr 80px;
+            gap: var(--line);
+        }
+        .side {
+            display: flex; align-items: center; justify-content: center;
+            writing-mode: vertical-lr;
+            font-size: 0.65rem; font-weight: 700; letter-spacing: 0.25em;
+            text-transform: uppercase; opacity: 0.15;
+        }
+        .side-l { background: var(--red); }
+        .side-r { background: rgba(250, 250, 250, 0.9); border-left: var(--line) solid var(--black); }
+        .content { padding: 6rem 3rem; }
+
+        /* HERO */
+        .hero { margin-bottom: 5rem; }
+        .hero-tag { font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--red); margin-bottom: 1.5rem; display: block; }
+        .hero h1 { font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 700; line-height: 1.1; margin-bottom: 1.5rem; }
+        .hero h1 em { font-style: normal; color: var(--yellow); }
+        .hero-sub { font-size: 1rem; font-weight: 300; color: #888; max-width: 550px; line-height: 1.7; margin-bottom: 3rem; }
+
+        /* MONDRIAN HERO */
+        .mgrid {
+            width: 100%; max-width: 700px; aspect-ratio: 2/1;
+            display: grid; grid-template-columns: 2fr 1fr 1fr; grid-template-rows: 1fr 1fr;
+            gap: 4px; background: var(--black); border: 4px solid var(--black);
+        }
+        .mc { transition: all 0.3s; cursor: pointer; position: relative; }
+        .mc:hover { filter: brightness(1.1); z-index: 2; }
+        .mc:nth-child(1) { grid-row: 1 / 3; background: var(--white); }
+        .mc:nth-child(2) { background: var(--red); }
+        .mc:nth-child(3) { background: var(--yellow); }
+        .mc:nth-child(4) { background: var(--blue); }
+        .mc:nth-child(5) { grid-column: 2 / 4; background: var(--white); }
+        .mc span {
+            position: absolute; bottom: 8px; left: 8px;
+            font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.4;
+        }
+
+        /* SECTION */
+        .sec-head { margin-bottom: 3rem; }
+        .sec-tag { font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: #aaa; margin-bottom: 1rem; display: block; }
+        .sec-tag--red { color: var(--red); }
+        .sec-h2 { font-size: clamp(1.8rem, 3vw, 2.5rem); font-weight: 700; margin-bottom: 1rem; }
+        .sec-h2 em { font-style: normal; color: var(--yellow); }
+        .sec-desc { font-size: 0.95rem; line-height: 1.6; color: #888; max-width: 600px; }
+
+        /* FEATURES */
+        .fgrid { display: grid; grid-template-columns: repeat(2,1fr); gap: var(--line); }
+        .fitem { background: rgba(240, 240, 240, 0.9); padding: 2rem 1.5rem; border-left: 3px solid transparent; }
+        .fitem:nth-child(1) { border-left-color: var(--red); }
+        .fitem:nth-child(2) { border-left-color: var(--blue); }
+        .fitem:nth-child(3) { border-left-color: var(--yellow); }
+        .ftitle { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem; }
+        .fdesc { font-size: 0.9rem; line-height: 1.5; color: #444; }
+
+        /* DEMO CANVAS */
+        .hero-grid-info {
+            display: flex;
+            gap: 2.5rem;
+            align-items: flex-start;
+        }
+        .hero-grid-info .mgrid {
+            flex: 1;
+            min-width: 0;
+        }
+        .demo-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .demo-info .fgrid { grid-template-columns: 1fr; gap: 1.5rem; }
+        .demo-info .fitem {
+            background: rgba(240, 240, 240, 0.9);
+            padding: 2rem 1.5rem;
+            border-left: 3px solid transparent;
+        }
+        .demo-info .fitem:nth-child(1) { border-left-color: var(--red); }
+        .demo-info .fitem:nth-child(2) { border-left-color: var(--blue); }
+        .demo-canvas-row {
+            display: flex;
+            gap: 2.5rem;
+            align-items: flex-start;
+        }
+        .demo-canvas-row .dc {
+            flex: 1;
+            min-width: 0;
+        }
+        .demo-instructions {
+            flex: 1;
+            min-width: 0;
+        }
+        .dc {
+            width: 100%; aspect-ratio: 2/1;
+            display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; grid-template-rows: 2fr 1fr 1fr 1fr;
+            gap: 4px; background: var(--black); border: 4px solid var(--black);
+            cursor: crosshair;
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .dc div { transition: background 0.15s; }
+        .dc div:hover { opacity: 0.85; }
+        .dc .r1  { grid-column: 1/3; grid-row: 1/3; }
+        .dc .r2  { grid-column: 3; grid-row: 1; }
+        .dc .r3  { grid-column: 4/6; grid-row: 1/3; }
+        .dc .r4  { grid-column: 3; grid-row: 2; }
+        .dc .r5  { grid-column: 1; grid-row: 3; }
+        .dc .r6  { grid-column: 2; grid-row: 3; }
+        .dc .r7  { grid-column: 3/5; grid-row: 3; }
+        .dc .r8  { grid-column: 5; grid-row: 3; }
+        .dc .r9  { grid-column: 1/3; grid-row: 4; }
+        .dc .r10 { grid-column: 3; grid-row: 4; }
+        .dc .r11 { grid-column: 4; grid-row: 4; }
+        .dc .r12 { grid-column: 5; grid-row: 4; }
+
+        #startBtn {
+            transition: opacity 0.4s ease;
+        }
+        #startBtn.is-hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* HAND INSTRUCTIONS */
+        .hand-instructions {
+            background: rgba(240, 240, 240, 0.9);
+            border-left: 3px solid var(--red);
+            padding: 1.5rem 2rem;
+            margin-bottom: 1.5rem;
+            height: auto;
+            display: block;
+        }
+        .hand-instructions p {
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: #444;
+            line-height: 1.6;
+            white-space: normal;
+            opacity: 1;
+            transform: none;
+            transition: none;
+        }
+        .hand-instructions p + p {
+            margin-top: 0.5rem;
+        }
+        .dc.is-active {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            width: 90vw;
+            max-width: 900px;
+            aspect-ratio: 2/1;
+            margin: auto;
+            box-shadow: 0 0 80px rgba(0,0,0,0.4);
+        }
+        .close-overlay {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 10001;
+            width: 48px;
+            height: 48px;
+            background: var(--black);
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+        .close-overlay:hover { background: var(--red); }
+
+        /* DIVIDER */
+        .divider {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: var(--line);
+            margin: 5rem 0;
+        }
+        .divider-box { padding: 2rem; display: flex; align-items: center; justify-content: center; text-align: center; }
+        .divider-box h3 { font-size: 0.85rem; font-weight: 400; color: #999; letter-spacing: 0.1em; text-transform: uppercase; }
+        .db-blue { background: var(--blue); }
+        .db-blue h3 { color: rgba(255,255,255,0.7); }
+        .db-black { background: var(--black); }
+        .db-black h3 { color: #666; }
+        .db-yellow { background: var(--yellow); }
+        .db-red { background: var(--red); }
+        .db-red h3 { color: rgba(255,255,255,0.7); }
+
+        /* CTA */
+        .cta { text-align: center; padding: 4rem 0; }
+        .cta-btn {
+            display: inline-block; padding: 1.2rem 3rem;
+            background: var(--black); color: var(--white);
+            text-decoration: none; font-size: 0.85rem; font-weight: 600;
+            letter-spacing: 0.15em; text-transform: uppercase;
+            transition: all 0.3s; border: none; cursor: pointer;
+        }
+        .cta-btn:hover { background: var(--red); }
+
+        /* FOOTER */
+        .footer {
+            display: grid; grid-template-columns: 80px 1fr 80px;
+            gap: var(--line); margin-top: var(--line);
+        }
+        .footer-l { background: var(--yellow); }
+        .footer-mid {
+            background: rgba(250, 250, 250, 0.9);
+            border-top: var(--line) solid var(--black);
+            padding: 1.5rem; display: flex; justify-content: center; align-items: center;
+        }
+        .footer-r { background: var(--red); }
+        .footer-text { font-size: 0.7rem; color: #aaa; letter-spacing: 0.1em; }
+
+        /* PLANS */
+        .plansgrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--line); }
+        .plan { background: rgba(240, 240, 240, 0.9); padding: 2rem 1.5rem; border-top: 4px solid transparent; }
+        .plan--1 { border-top-color: var(--red); }
+        .plan--2 { border-top-color: var(--blue); }
+        .plan-num { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: #aaa; margin-bottom: 1rem; }
+        .plan-name { font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem; }
+        .plan-desc { font-size: 0.85rem; line-height: 1.5; color: #888; margin-bottom: 1rem; }
+        .plan-tag { font-size: 1.6rem; font-weight: 700; color: var(--black); margin-top: 1rem; }
+        .plan-tag-usd { font-size: 0.65rem; font-weight: 400; color: #aaa; letter-spacing: 0.1em; text-transform: uppercase; }
+
+        @media (max-width: 1024px) {
+            .header, .main, .footer { grid-template-columns: 1fr; }
+            .header-l, .header-r, .side, .footer-l, .footer-r { display: none; }
+            .content { padding: 4rem 2rem; }
+        }
+        @media (max-width: 768px) {
+            .content { padding: 3rem 1.5rem; }
+            .fgrid, .plansgrid { grid-template-columns: 1fr; }
+            .hero-grid-info, .demo-canvas-row { flex-direction: column; }
+            .divider { grid-template-columns: 1fr; }
+            body { font-size: 0.9rem; }
+            .back { padding: 0.75rem 0.5rem; }
+        }
+
+        .reveal { opacity: 0; transform: translateY(15px); transition: all 0.5s ease; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+
+    <!-- MONDRIAN BACKGROUND -->
+    <div class="mondrian-bg">
+        <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+            <rect width="500" height="500" fill="#f0f0f0"/>
+            <rect x="0" y="0" width="500" height="500" fill="#f0f0f0" stroke="#1a1a1a" stroke-width="12"/>
+
+            <g id="color-blocks">
+                <rect id="box-red-1" class="color-box" x="45" y="60" width="125" height="180" fill="#E63946"/>
+                <rect id="box-yellow-1" class="color-box" x="170" y="60" width="80" height="90" fill="#F4D35E"/>
+                <rect id="box-blue-1" class="color-box" x="250" y="35" width="90" height="75" fill="#1D3557"/>
+                <rect id="box-black-1" class="color-box" x="340" y="150" width="80" height="90" fill="#0D0D0D"/>
+                <rect id="box-red-2" class="color-box" x="250" y="110" width="90" height="80" fill="#E63946"/>
+                <rect id="box-yellow-2" class="color-box" x="250" y="240" width="90" height="130" fill="#F4D35E"/>
+                <rect id="box-blue-2" class="color-box" x="170" y="240" width="80" height="130" fill="#1D3557"/>
+                <rect id="box-black-2" class="color-box" x="215" y="420" width="55" height="50" fill="#0D0D0D"/>
+                <rect id="box-red-3" class="color-box" x="170" y="370" width="100" height="100" fill="#E63946"/>
+                <rect id="box-yellow-3" class="color-box" x="45" y="240" width="55" height="180" fill="#F4D35E"/>
+                <rect id="box-blue-3" class="color-box" x="340" y="240" width="160" height="230" fill="#1D3557"/>
+                <rect id="box-black-3" class="color-box" x="45" y="420" width="125" height="50" fill="#0D0D0D"/>
+            </g>
+
+            <g stroke="#1a1a1a" stroke-width="8" stroke-linecap="square">
+                <line id="h1" class="line-h" x1="0" y1="60" x2="500" y2="60"/>
+                <line id="h2" class="line-h" x1="0" y1="150" x2="500" y2="150"/>
+                <line id="h3" class="line-h" x1="0" y1="240" x2="500" y2="240"/>
+                <line id="h4" class="line-h" x1="0" y1="370" x2="500" y2="370"/>
+                <line id="h5" class="line-h" x1="0" y1="470" x2="500" y2="470"/>
+                <line id="v1" class="line-v" x1="45" y1="0" x2="45" y2="500"/>
+                <line id="v2" class="line-v" x1="170" y1="0" x2="170" y2="500"/>
+                <line id="v3" class="line-v" x1="250" y1="0" x2="250" y2="500"/>
+                <line id="v4" class="line-v" x1="340" y1="0" x2="340" y2="500"/>
+            </g>
+        </svg>
+    </div>
+
+    <!-- CONTENT OVERLAY -->
+    <div class="content-overlay" id="contentOverlay">
+        <div class="header">
+            <div class="header-l" id="hdr-accent-l" data-editable>C</div>
+            <div class="header-mid">
+                <div class="logo" id="hdr-logo" data-editable>Canaem Briceño</div>
+                <a href="index.html" class="back">← Volver</a>
+            </div>
+            <div class="header-r" id="hdr-accent-r" data-editable>CB</div>
+        </div>
+
+        <div class="main">
+            <div class="side side-l" id="side-l" data-editable>EXPERIENCIA INTERACTIVA</div>
+            <div class="content">
+
+                <!-- HERO -->
+                <section class="hero">
+                    <span class="hero-tag" id="hero-tag" data-editable>Experiencia Interactiva</span>
+                    <h1 id="hero-title" data-editable>Sistema <em>Interactivo</em></h1>
+                    <p class="hero-sub" id="hero-sub" data-editable>Experiencia interactiva basada en la estética de Mondrian. Los colores reaccionan al movimiento.</p>
+                    <div class="hero-grid-info">
+                        <div class="mgrid" id="heroGrid">
+                            <div class="mc"><span id="mg1" data-editable>Blanco</span></div>
+                            <div class="mc"><span id="mg2" data-editable>Rojo</span></div>
+                            <div class="mc"><span id="mg3" data-editable>Amarillo</span></div>
+                            <div class="mc"><span id="mg4" data-editable>Azul</span></div>
+                            <div class="mc"><span id="mg5" data-editable>Blanco</span></div>
+                        </div>
+                        <div class="demo-info">
+                            <div class="fgrid reveal">
+                                <div class="fitem"><div class="ftitle" id="f1-title" data-editable>Interacción en tiempo real</div><div class="fdesc" id="f1-desc" data-editable>Cada movimiento produce un cambio visual instantáneo, creando composiciones únicas en tiempo real.</div></div>
+                                <div class="fitem"><div class="ftitle" id="f2-title" data-editable>Estética Mondrian</div><div class="fdesc" id="f2-desc" data-editable>Basado en la obra de Piet Mondrian: líneas negras, bloques de color y proporciones geométricas.</div></div>
+                            </div>
+                            <p style="margin-top:2rem; font-size:0.85rem; line-height:1.6; color:var(--red); max-width:500px; text-align:left; margin-left:1rem;">Este es un concepto demo del sistema interactivo. Para el desarrollo del software final y su adaptación al evento, se requiere una interpretación más detallada de las necesidades y visión del cliente.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- DEMO -->
+                <section style="margin-top:3rem;">
+                    <div class="sec-head">
+                        <span class="sec-tag sec-tag--red" id="demo-tag" data-editable>Demo</span>
+                        <h2 class="sec-h2" id="demo-title" data-editable>Prueba el <em>sistema</em></h2>
+                    </div>
+                    <div class="demo-canvas-row">
+                        <div class="dc" id="demoCanvas"></div>
+                        <div class="demo-instructions">
+                            <div class="hand-instructions" id="handInstructions">
+                                <p>Muévete frente al sistema</p>
+                                <p>Los colores reaccionan a tus movimientos</p>
+                                <p>Cada gesto crea una composición única</p>
+                            </div>
+                            <div style="text-align:center;">
+                                <button class="cta-btn" id="startBtn">Iniciar Experiencia</button>
+                            </div>
+                            <p style="margin-top:1.5rem;font-size:0.65rem;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;text-align:left;" id="demo-caption" data-editable>Demo del sistema · Composición en tiempo real</p>
+                            <div style="text-align:center; margin-top:1.5rem;">
+                                <button class="close-overlay" id="closeOverlay" style="display:none;">×</button>
+                            </div>
+                        </div>
+                        <video id="handVideo" playsinline style="display:none;"></video>
+                    </div>
+                </section>
+
+                <!-- PLANS -->
+                <section>
+                    <div class="sec-head">
+                        <span class="sec-tag sec-tag--red" id="plans-tag" data-editable>Planes de cobro</span>
+                        <h2 class="sec-h2" id="plans-title" data-editable>Opciones de <em>pago</em></h2>
+                    </div>
+                    <div class="plansgrid reveal">
+                        <div class="plan plan--1">
+                            <div class="plan-num">PLAN 1</div>
+                            <div class="plan-name" id="plan1-name" data-editable>Experiencia Completa</div>
+                            <div class="plan-desc" id="plan1-desc" data-editable>Interacción con track de mano en dos zonas del evento.</div>
+                            <div class="plan-tag">$<span data-editable id="plan1-price">600</span> <span class="plan-tag-usd">USD</span></div>
+                        </div>
+                        <div class="plan plan--2">
+                            <div class="plan-num">PLAN 2</div>
+                            <div class="plan-name" id="plan2-name" data-editable>Experiencia Básica</div>
+                            <div class="plan-desc" id="plan2-desc" data-editable>Interacción con track de mano en una zona del evento.</div>
+                            <div class="plan-tag">$<span data-editable id="plan2-price">400</span> <span class="plan-tag-usd">USD</span></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- CTA -->
+                <div class="cta">
+                    <a href="pintura.html" class="cta-btn" id="cta-btn" data-editable>← Ver Pintura en Vivo</a>
+                </div>
+
+            </div>
+            <div class="side side-r" id="side-r" data-editable>EN TIEMPO REAL</div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-l"></div>
+            <div class="footer-mid"><span class="footer-text" id="footer-text" data-editable>© 2026 Canaem Briceño · Caracas, Venezuela</span></div>
+            <div class="footer-r"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+
+    <script>
+    (function() {
+        var contentOverlay = document.getElementById('contentOverlay');
+        var isReturn = window.location.search.indexOf('return=1') !== -1;
+        var played = sessionStorage.getItem('anim_interactivo');
+
+        function showContent() {
+            contentOverlay.classList.add('is-visible');
+            sessionStorage.setItem('anim_interactivo', '1');
+        }
+
+        if (played) {
+            document.documentElement.classList.add('no-anim');
+        }
+
+        window.addEventListener('pageshow', function(e) {
+            if (e.persisted || played) {
+                document.documentElement.classList.add('no-anim');
+                showContent();
+            }
+        });
+
+        if (isReturn || played) {
+            showContent();
+        } else {
+            setTimeout(showContent, 4200);
+        }
+
+        // Hero grid interaction
+        var hc = document.querySelectorAll('.mc');
+        var cols = ['#FAFAFA','#E63946','#F4D35E','#1D3557'];
+        hc.forEach(function(c) {
+            c.addEventListener('click', function() {
+                c.style.background = cols[Math.floor(Math.random()*cols.length)];
+            });
+        });
+
+        // Demo canvas
+        var dc = document.getElementById('demoCanvas');
+        var cells = [];
+        var mondrianLayout = [
+            { cls: 'r1',  color: '#FAFAFA' },
+            { cls: 'r2',  color: '#FAFAFA' },
+            { cls: 'r3',  color: '#FAFAFA' },
+            { cls: 'r4',  color: '#FAFAFA' },
+            { cls: 'r5',  color: '#FAFAFA' },
+            { cls: 'r6',  color: '#FAFAFA' },
+            { cls: 'r7',  color: '#FAFAFA' },
+            { cls: 'r8',  color: '#FAFAFA' },
+            { cls: 'r9',  color: '#FAFAFA' },
+            { cls: 'r10', color: '#FAFAFA' },
+            { cls: 'r11', color: '#FAFAFA' },
+            { cls: 'r12', color: '#FAFAFA' }
+        ];
+        mondrianLayout.forEach(function(item) {
+            var d = document.createElement('div');
+            d.className = item.cls;
+            d.style.background = item.color;
+            cells.push(d);
+            dc.appendChild(d);
+        });
+
+        // Interacción en tiempo real
+        var startBtn = document.getElementById('startBtn');
+        var handVideo = document.getElementById('handVideo');
+        var trackingActive = false;
+        var camera = null;
+        var hands = null;
+
+        function paintCell(x, y) {
+            var rect = dc.getBoundingClientRect();
+            if(x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) return;
+            cells.forEach(function(c) {
+                var cr = c.getBoundingClientRect();
+                if(x >= cr.left && x <= cr.right && y >= cr.top && y <= cr.bottom) {
+                    c.style.background = cols[Math.floor(Math.random()*cols.length)];
+                }
+            });
+        }
+
+        function initHandTracking() {
+            if(trackingActive) return;
+            trackingActive = true;
+            startBtn.textContent = 'Experiencia Activa';
+            startBtn.disabled = true;
+            startBtn.classList.add('is-hidden');
+            dc.classList.add('is-active');
+            document.getElementById('closeOverlay').style.display = 'flex';
+            camera.start();
+        }
+
+        // Inicializar hands y camera una sola vez al cargar
+        try {
+            hands = new Hands({
+                locateFile: function(file) {
+                    return 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/' + file;
+                }
+            });
+            hands.setOptions({
+                maxNumHands: 1,
+                modelComplexity: 1,
+                minDetectionConfidence: 0.7,
+                minTrackingConfidence: 0.5
+            });
+            hands.onResults(function(results) {
+                if(results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                    var lm = results.multiHandLandmarks[0];
+                    var x = (1 - lm[9].x) * window.innerWidth;
+                    var y = lm[9].y * window.innerHeight;
+                    paintCell(x, y);
+                }
+            });
+
+            camera = new Camera(handVideo, {
+                onFrame: async function() {
+                    await hands.send({ image: handVideo });
+                },
+                width: 640,
+                height: 480
+            });
+        } catch(e) {
+            console.error('Error al inicializar la cámara:', e);
+        }
+
+        document.getElementById('closeOverlay').addEventListener('click', function() {
+            trackingActive = false;
+            if(camera) camera.stop();
+            dc.classList.remove('is-active');
+            document.getElementById('closeOverlay').style.display = 'none';
+            startBtn.textContent = 'Iniciar Experiencia';
+            startBtn.disabled = false;
+            startBtn.classList.remove('is-hidden');
+        });
+
+        startBtn.addEventListener('click', initHandTracking);
+
+        // Reveal on scroll
+        var r = document.querySelectorAll('.reveal');
+        var f = function() { r.forEach(function(e) { if(e.getBoundingClientRect().top < innerHeight-100) e.classList.add('active'); }); };
+        addEventListener('scroll', f);
+        addEventListener('load', f);
+    })();
+    </script>
+
+</body>
+</html>

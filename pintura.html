@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pintura en Vivo | Canaem Briceño</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --red: #d92718;
+            --blue: #00b3a4;
+            --yellow: #f2c700;
+            --black: #0b0b0b;
+            --white: #f3f3ee;
+            --line: 4px;
+        }
+        body { font-family: 'Space Grotesk', sans-serif; background: var(--black); overflow-x: hidden; color: var(--black); }
+
+
+
+        /* LE CORBUSIER BACKGROUND STYLES */
+        .mondrian-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 1;
+            background: #0b0b0b;
+        }
+        .mondrian-bg svg {
+            width: 100%; height: 100%;
+        }
+
+        /* LE CORBUSIER SVG STYLES */
+        .bg-black { fill: #0b0b0b; }
+        .bg-red { fill: #d92718; }
+        .shape-white { fill: #f3f3ee; }
+        .yellow-tri { fill: #f2c700; }
+        .turquoise { stroke: #00b3a4; fill: none; stroke-width: 6; stroke-linecap: round; }
+        .turquoise-fill { fill: #00b3a4; }
+
+        @keyframes draw-anim {
+            to { stroke-dashoffset: 0; }
+        }
+        @keyframes fade-in-anim {
+            to { opacity: 1; }
+        }
+        .draw-line {
+            fill: none;
+            stroke: #f3f3ee;
+            stroke-width: 5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 4500;
+            stroke-dashoffset: 4500;
+            animation: draw-anim 3.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation-delay: 1.5s;
+        }
+        .draw-line-thin {
+            fill: none;
+            stroke: #f3f3ee;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 2000;
+            stroke-dashoffset: 2000;
+            animation: draw-anim 2.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation-delay: 2.8s;
+        }
+        .fade-in {
+            opacity: 0;
+            animation: fade-in-anim 0.8s ease forwards;
+        }
+
+        /* NO-REPLAY (skip animations on return) */
+        .no-anim .draw-line,
+        .no-anim .draw-line-thin,
+        .no-anim .fade-in {
+            animation: none !important;
+            opacity: 1 !important;
+        }
+        .no-anim .draw-line,
+        .no-anim .draw-line-thin {
+            stroke-dashoffset: 0 !important;
+        }
+
+        /* CONTENT OVERLAY */
+        .content-overlay {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            background: rgba(243, 243, 238, 0.85);
+            backdrop-filter: blur(2px);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .content-overlay.is-visible {
+            opacity: 1;
+        }
+
+        /* HEADER */
+        .header {
+            display: grid;
+            grid-template-columns: 80px 1fr 80px;
+            gap: var(--line);
+        }
+        .header-l, .header-r {
+            background: var(--yellow);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; font-weight: 700; color: var(--black); opacity: 0.4;
+        }
+        .header-r { background: var(--red); }
+        .header-mid {
+            background: rgba(243, 243, 238, 0.9);
+            border-bottom: var(--line) solid var(--black);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.5rem 2.5rem;
+        }
+        .logo { font-size: 0.85rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; }
+        .back { font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: #aaa; text-decoration: none; transition: color 0.3s; }
+        .back:hover { color: var(--black); }
+
+        /* MAIN */
+        .main {
+            display: grid;
+            grid-template-columns: 80px 1fr 80px;
+            gap: var(--line);
+        }
+        .side {
+            display: flex; align-items: center; justify-content: center;
+            writing-mode: vertical-lr;
+            font-size: 0.65rem; font-weight: 700; letter-spacing: 0.25em;
+            text-transform: uppercase; opacity: 0.15;
+        }
+        .side-l { background: var(--blue); }
+        .side-r { background: rgba(243, 243, 238, 0.9); border-left: var(--line) solid var(--black); }
+        .content { padding: 6rem 3rem; }
+
+        /* HERO */
+        .hero { margin-bottom: 5rem; }
+        .hero-tag { font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: #aaa; margin-bottom: 1.5rem; display: block; }
+        .hero h1 { font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 700; line-height: 1.1; margin-bottom: 1.5rem; }
+        .hero h1 em { font-style: normal; color: var(--yellow); }
+        .hero-sub { font-size: 1rem; font-weight: 300; color: #888; max-width: 550px; line-height: 1.7; margin-bottom: 3rem; }
+        .hero-specs { display: flex; gap: 3rem; }
+        .hero-spec-val { font-size: 1.5rem; font-weight: 700; color: var(--yellow); }
+        .hero-spec-lbl { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; color: #aaa; margin-top: 0.3rem; }
+
+        /* PORCELAIN */
+        .porcelain-wrap {
+            display: flex;
+            gap: 2.5rem;
+            max-width: 100%;
+            margin-bottom: 1rem;
+        }
+        .porcelain-img { flex: 1; min-width: 0; }
+        .porcelain-img .porcelain {
+            display: block;
+            width: 100%;
+            aspect-ratio: 2/1;
+            object-fit: cover;
+            border: 4px solid var(--blue);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            margin-bottom: 0.5rem;
+        }
+        .porcelain-txt {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.78);
+            border-left: 5px solid var(--blue);
+            padding: 2.5rem;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #444;
+        }
+        .porcelain-concept-title {
+            font-size: 0.75rem;
+            color: var(--blue);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+        .pcap { font-size: 0.65rem; color: var(--blue); letter-spacing: 0.12em; text-transform: uppercase; }
+
+        /* SECTION */
+        .sec-head { margin-bottom: 3rem; }
+        .sec-tag { font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: #aaa; margin-bottom: 1rem; display: block; }
+        .sec-h2 { font-size: clamp(1.8rem, 3vw, 2.5rem); font-weight: 700; margin-bottom: 1rem; }
+        .sec-h2 em { font-style: normal; color: var(--yellow); }
+        .sec-desc { font-size: 0.95rem; line-height: 1.6; color: #888; max-width: 600px; }
+
+        /* PROCESS */
+        .prgrid { display: grid; grid-template-columns: repeat(3,1fr); gap: var(--line); }
+        .prgrid .step { background: rgba(240, 240, 240, 0.9); padding: 2rem 1.5rem; border-top: 3px solid transparent; }
+        .prgrid .step:nth-child(1) { border-top-color: var(--red); }
+        .prgrid .step:nth-child(2) { border-top-color: var(--blue); }
+        .prgrid .step:nth-child(3) { border-top-color: var(--yellow); }
+        .prnum { font-size: 2rem; font-weight: 700; opacity: 0.15; margin-bottom: 0.75rem; }
+        .prtitle { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem; }
+        .prdesc { font-size: 0.85rem; line-height: 1.5; color: #888; }
+
+        /* MATERIALS */
+        .materials-list { display: grid; grid-template-columns: 1fr 1fr; gap: var(--line); }
+        .m-item { background: rgba(240, 240, 240, 0.9); padding: 1.5rem; display: flex; align-items: center; gap: 1rem; }
+        .m-num { font-size: 1.2rem; font-weight: 700; color: var(--yellow); opacity: 0.5; }
+        .m-text { font-size: 0.85rem; }
+
+        /* PLANS */
+        .plansgrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--line); }
+        .plan { background: rgba(240, 240, 240, 0.9); padding: 2rem 1.5rem; border-top: 4px solid transparent; }
+        .plan--1 { border-top-color: var(--red); }
+        .plan--2 { border-top-color: var(--blue); }
+        .plan-num { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: #aaa; margin-bottom: 1rem; }
+        .plan-name { font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem; }
+        .plan-desc { font-size: 0.85rem; line-height: 1.5; color: #888; margin-bottom: 1rem; }
+        .plan-tag { font-size: 1.6rem; font-weight: 700; color: var(--black); margin-top: 1rem; }
+        .plan-tag-usd { font-size: 0.65rem; font-weight: 400; color: #aaa; letter-spacing: 0.1em; text-transform: uppercase; }
+
+        /* CTA */
+        .cta { text-align: center; padding: 4rem 0; }
+        .cta-btn {
+            display: inline-block; padding: 1.2rem 3rem;
+            background: var(--black); color: var(--white);
+            text-decoration: none; font-size: 0.85rem; font-weight: 600;
+            letter-spacing: 0.15em; text-transform: uppercase;
+            transition: all 0.3s; border: none; cursor: pointer;
+        }
+        .cta-btn:hover { background: var(--red); }
+
+        /* DIVIDER */
+        .divider {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: var(--line);
+            margin: 5rem 0;
+        }
+        .divider-box { padding: 2rem; display: flex; align-items: center; justify-content: center; text-align: center; }
+        .divider-box h3 { font-size: 0.85rem; font-weight: 400; color: #999; letter-spacing: 0.1em; text-transform: uppercase; }
+        .db-yellow { background: var(--yellow); }
+        .db-black { background: var(--black); }
+        .db-black h3 { color: #666; }
+        .db-red { background: var(--red); }
+        .db-red h3 { color: rgba(255,255,255,0.7); }
+
+        /* FOOTER */
+        .footer {
+            display: grid; grid-template-columns: 80px 1fr 80px;
+            gap: var(--line); margin-top: var(--line);
+        }
+        .footer-l { background: var(--yellow); }
+        .footer-mid {
+            background: rgba(243, 243, 238, 0.9);
+            border-top: var(--line) solid var(--black);
+            padding: 1.5rem; display: flex; justify-content: center; align-items: center;
+        }
+        .footer-r { background: var(--red); }
+        .footer-text { font-size: 0.7rem; color: #aaa; letter-spacing: 0.1em; }
+
+        @media (max-width: 1024px) {
+            .header, .main, .footer { grid-template-columns: 1fr; }
+            .header-l, .header-r, .side, .footer-l, .footer-r { display: none; }
+            .content { padding: 4rem 2rem; }
+        }
+        @media (max-width: 768px) {
+            .content { padding: 3rem 1.5rem; }
+            .porcelain-wrap { flex-direction: column; }
+            .porcelain-txt { flex: 1 1 auto; }
+            .prgrid, .materials-list, .plansgrid { grid-template-columns: 1fr; }
+            .hero-specs { flex-direction: column; gap: 1.5rem; }
+            .divider { grid-template-columns: 1fr; }
+            body { font-size: 0.9rem; }
+            .back { padding: 0.75rem 0.5rem; }
+        }
+
+        .reveal { opacity: 0; transform: translateY(15px); transition: all 0.5s ease; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+
+    <!-- LE CORBUSIER BACKGROUND -->
+    <div class="mondrian-bg">
+        <svg viewBox="0 0 1600 1000" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+            <rect width="1600" height="1000" class="bg-black" />
+
+            <path d="M 0,210 L 780,210 C 790,380 820,620 670,860 L 0,910 Z" class="bg-red fade-in" style="animation-delay: 0.2s;" />
+            <path d="M 600,30 C 820,10 1020,70 1560,70 L 1560,910 L 780,910 C 730,790 700,600 640,510 C 580,420 560,270 600,30 Z" class="bg-black fade-in" style="animation-delay: 0.4s;" />
+            <path d="M 350,30 C 520,20 640,40 780,65 C 760,170 740,260 690,330 C 640,410 560,440 500,410 C 435,380 420,300 480,270 C 510,250 500,205 450,215 C 410,225 390,290 370,370 C 350,450 410,530 480,560 C 560,590 660,490 750,370 L 820,420 C 740,550 630,640 520,650 C 410,660 330,560 320,410 C 310,260 320,100 350,30 Z" class="shape-white fade-in" style="animation-delay: 0.6s;" />
+
+            <path d="M 480,290 C 530,290 570,330 560,370 C 550,410 490,440 470,410 C 450,380 430,320 480,290 Z" class="bg-red fade-in" style="animation-delay: 0.8s;" />
+            <circle cx="500" cy="435" r="14" class="bg-red fade-in" style="animation-delay: 0.8s;" />
+            <polygon points="680,120 740,205 655,225" class="yellow-tri fade-in" style="animation-delay: 1.0s;" />
+            <polygon points="655,225 740,205 695,235" class="bg-black fade-in" style="animation-delay: 1.0s;" />
+            <circle cx="110" cy="910" r="95" class="bg-black fade-in" style="animation-delay: 1.0s;" />
+
+            <g class="fade-in" style="animation-delay: 1.2s;">
+                <path d="M 1440,250 C 1470,245 1510,250 1540,270 C 1560,300 1540,350 1500,350 C 1460,350 1430,310 1440,250 Z" fill="#f3f3ee" stroke="#0b0b0b" stroke-width="3" />
+                <path d="M 1450,275 C 1480,270 1520,280 1525,325" fill="none" stroke="#0b0b0b" stroke-width="2" />
+            </g>
+
+            <path d="M 70,900 C 90,720 145,550 220,430 C 295,310 380,190 360,85 C 350,30 245,30 145,50 C 70,75 20,180 20,360 C 20,600 95,780 170,900" class="draw-line" />
+            <path d="M 145,900 C 220,770 305,620 340,500 C 375,380 400,270 335,190 C 285,130 210,130 165,165 C 120,200 110,280 145,335 C 180,390 265,450 300,560 C 335,670 265,815 220,900" class="draw-line" style="animation-delay: 2.0s; stroke-width: 4;" />
+            <path d="M 335,260 C 385,260 420,310 380,350 C 340,390 295,350 335,260 Z" class="draw-line" style="animation-delay: 2.4s; stroke-width: 4;" />
+            <path d="M 100,910 C 200,790 350,840 500,840 C 620,840 750,840 1520,840" class="draw-line" style="animation-delay: 2.6s; stroke-width: 4;" />
+
+            <path d="M 660,810 C 630,810 615,835 615,865 C 615,895 645,910 685,910 C 725,910 745,885 745,855 C 745,825 695,810 660,810 Z" class="turquoise fade-in" style="animation-delay: 2.6s;" />
+            <g class="turquoise-fill fade-in" style="animation-delay: 2.8s;">
+                <rect x="625" y="910" width="8" height="22" />
+                <rect x="643" y="910" width="8" height="22" />
+                <rect x="661" y="910" width="8" height="22" />
+                <rect x="679" y="910" width="8" height="22" />
+                <rect x="697" y="910" width="8" height="22" />
+                <rect x="715" y="910" width="8" height="22" />
+            </g>
+            <g class="draw-line-thin" style="animation-delay: 2.8s;">
+                <path d="M 950,840 L 950,910 L 1020,910 L 1020,840 Z" />
+                <path d="M 985,840 L 985,910 M 950,875 L 1020,875" />
+                <path d="M 965,885 L 975,895 M 980,885 L 990,895 M 995,885 L 1005,895" />
+                <path d="M 1020,890 L 1050,920 L 1030,940" />
+            </g>
+
+            <path d="M 780,520 C 840,510 920,510 1020,520 C 1070,530 1080,580 1070,640 C 1060,710 985,760 900,760 L 780,760 Z" class="draw-line" style="animation-delay: 2.5s; stroke-width: 5;" />
+            <path d="M 840,550 L 840,730 M 840,550 L 990,550 C 1040,550 1050,590 1030,630 C 1010,670 920,730 840,730" class="draw-line" style="animation-delay: 2.8s; stroke-width: 4;" />
+            <g class="draw-line-thin" style="animation-delay: 3.0s;">
+                <line x1="855" y1="580" x2="880" y2="555" />
+                <line x1="880" y1="580" x2="905" y2="555" />
+                <line x1="905" y1="580" x2="930" y2="555" />
+                <line x1="930" y1="580" x2="955" y2="555" />
+                <line x1="955" y1="580" x2="980" y2="555" />
+                <line x1="980" y1="580" x2="1005" y2="555" />
+            </g>
+            <path d="M 1240,910 C 1220,770 1280,630 1450,470" class="draw-line" style="animation-delay: 3.2s; stroke-width: 4;" />
+        </svg>
+    </div>
+
+    <!-- CONTENT OVERLAY -->
+    <div class="content-overlay" id="contentOverlay">
+        <div class="header">
+            <div class="header-l" id="hdr-accent-l" data-editable>C</div>
+            <div class="header-mid">
+                <div class="logo" id="hdr-logo" data-editable>Canaem Briceño</div>
+                <a href="index.html" class="back">← Volver</a>
+            </div>
+            <div class="header-r" id="hdr-accent-r" data-editable>CB</div>
+        </div>
+
+        <div class="main">
+            <div class="side side-l" id="side-l" data-editable>PINTURA EN VIVO</div>
+            <div class="content">
+
+                <!-- HERO -->
+                <section class="hero">
+                    <span class="hero-tag" id="hero-tag" data-editable>Pintura en Vivo</span>
+                    <h1 id="hero-title" data-editable>Composición en <em>Porcelana</em></h1>
+                    <p class="hero-sub" id="hero-sub" data-editable>Composición artística esmaltada en vivo sobre porcelana. El público presencia el proceso creativo en tiempo real.</p>
+                    <div class="hero-specs">
+                        <div><div class="hero-spec-val" id="hs0-val" data-editable>120×60</div><div class="hero-spec-lbl" id="hs0-lbl" data-editable>Centímetros</div></div>
+                        <div><div class="hero-spec-val" id="hs1-val" data-editable>Esmalte</div><div class="hero-spec-lbl" id="hs1-lbl" data-editable>Técnica</div></div>
+                        <div><div class="hero-spec-val" id="hs2-val" data-editable>Todo el evento</div><div class="hero-spec-lbl" id="hs2-lbl" data-editable>Duración</div></div>
+                        <div><div class="hero-spec-val" id="hs3-val" data-editable>Única</div><div class="hero-spec-lbl" id="hs3-lbl" data-editable>Edición</div></div>
+                    </div>
+                </section>
+
+                <!-- PORCELAIN -->
+                <section>
+                    <div class="reveal">
+                        <div class="porcelain-wrap">
+                            <div class="porcelain-img">
+                                <img class="porcelain" src="leco/imagen1.jpg" alt="Composición en Porcelana">
+                                <p class="pcap" id="pcap" data-editable>Vista previa conceptual · 120 × 60 cm · Esmalte sobre porcelana</p>
+                            </div>
+                            <div class="porcelain-txt" id="porcelain-txt">
+                                <span class="porcelain-concept-title">Concepto</span>
+                                <span data-editable id="porcelain-txt-text">Inspirado en el purismo pictórico, corriente que fusiona arte abstracto y muralismo arquitectónico. Esta propuesta transforma sus baldosas en obras de arte, elevando el valor estético y comercial de cada pieza.</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- DIVIDER -->
+                <div class="divider">
+                    <div class="divider-box db-yellow"><h3>Materiales</h3></div>
+                    <div class="divider-box db-black"><h3>Tiempo</h3></div>
+                    <div class="divider-box db-red"><h3>Presupuesto</h3></div>
+                </div>
+
+                <!-- MATERIALES -->
+                <section style="margin-top:3rem;">
+                    <div class="sec-head">
+                        <span class="sec-tag" id="mat-tag" data-editable>Materiales</span>
+                        <h2 class="sec-h2" id="mat-title" data-editable>Materiales <em>necesarios</em></h2>
+                    </div>
+                    <div class="materials-list reveal">
+                        <div class="m-item"><div class="m-num">01</div><div class="m-text" id="m1-text" data-editable>Brochas</div></div>
+                        <div class="m-item"><div class="m-num">02</div><div class="m-text" id="m2-text" data-editable>Pinceles</div></div>
+                        <div class="m-item"><div class="m-num">03</div><div class="m-text" id="m3-text" data-editable>Pinturas aptas para la superficie</div></div>
+                        <div class="m-item"><div class="m-num">04</div><div class="m-text" id="m4-text" data-editable>Protección del espacio</div></div>
+                        <div class="m-item"><div class="m-num">05</div><div class="m-text" id="m5-text" data-editable>Sellador final</div></div>
+                    </div>
+                </section>
+
+                <!-- TIEMPO -->
+                <section style="margin-top:3rem;">
+                    <div class="sec-head">
+                        <span class="sec-tag" id="time-tag" data-editable>Tiempo</span>
+                        <h2 class="sec-h2" id="time-title" data-editable>Duración del <em>proceso</em></h2>
+                    </div>
+                    <div class="prgrid reveal">
+                        <div class="step"><div class="prnum">01</div><div class="prtitle" id="t1-title" data-editable>Preparación</div><div class="prdesc" id="t1-desc" data-editable>Día anterior al evento. Selección de porcelana, mezcla de pinturas y diseño de composición.</div></div>
+                        <div class="step"><div class="prnum">02</div><div class="prtitle" id="t2-title" data-editable>Pintura en Vivo</div><div class="prdesc" id="t2-desc" data-editable>Durante todo el evento. El público presencia la creación en tiempo real.</div></div>
+                    </div>
+                </section>
+
+                <!-- PLANES DE COBRO -->
+                <section style="margin-top:3rem;">
+                    <div class="sec-head">
+                        <span class="sec-tag" id="plans-tag" data-editable>Planes de cobro</span>
+                        <h2 class="sec-h2" id="plans-title" data-editable>Opciones de <em>pago</em></h2>
+                    </div>
+                    <div class="plansgrid reveal">
+                        <div class="plan plan--1">
+                            <div class="plan-num">PLAN 1</div>
+                            <div class="plan-name" id="plan1-name" data-editable>Dos Superficies</div>
+                            <div class="plan-desc" id="plan1-desc" data-editable>Pintura en vivo sobre 2 piezas de porcelana.</div>
+                            <div class="plan-tag" id="plan1-tag">$<span data-editable id="plan1-price">600</span> <span class="plan-tag-usd">USD</span></div>
+                        </div>
+                        <div class="plan plan--2">
+                            <div class="plan-num">PLAN 2</div>
+                            <div class="plan-name" id="plan2-name" data-editable>Una Superficie</div>
+                            <div class="plan-desc" id="plan2-desc" data-editable>Pintura en vivo sobre 1 pieza de porcelana.</div>
+                            <div class="plan-tag" id="plan2-tag">$<span data-editable id="plan2-price">350</span> <span class="plan-tag-usd">USD</span></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- CTA -->
+                <div class="cta">
+                    <a href="interactivo.html" class="cta-btn" id="cta-btn" data-editable>Ver Experiencia Inmersiva →</a>
+                </div>
+
+            </div>
+            <div class="side side-r" id="side-r" data-editable>COMPOSICIÓN EN VIVO</div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-l"></div>
+            <div class="footer-mid"><span class="footer-text" id="footer-text" data-editable>© 2026 Canaem Briceño · Caracas, Venezuela</span></div>
+            <div class="footer-r"></div>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        var contentOverlay = document.getElementById('contentOverlay');
+        var isReturn = window.location.search.indexOf('return=1') !== -1;
+        var played = sessionStorage.getItem('anim_pintura');
+
+        function showContent() {
+            contentOverlay.classList.add('is-visible');
+            sessionStorage.setItem('anim_pintura', '1');
+        }
+
+        if (played) {
+            document.documentElement.classList.add('no-anim');
+        }
+
+        window.addEventListener('pageshow', function(e) {
+            if (e.persisted || played) {
+                document.documentElement.classList.add('no-anim');
+                showContent();
+            }
+        });
+
+        if (isReturn || played) {
+            showContent();
+        } else {
+            setTimeout(showContent, 5000);
+        }
+
+        // Reveal on scroll
+        var r = document.querySelectorAll('.reveal');
+        var f = function() { r.forEach(function(e) { if(e.getBoundingClientRect().top < innerHeight-100) e.classList.add('active'); }); };
+        addEventListener('scroll', f);
+        addEventListener('load', f);
+    })();
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canaem Briceño | Información del Artista</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --orange: #ffb700;
+            --blue: #0055ff;
+            --red: #ff0033;
+            --white: #ffffff;
+            --black: #111111;
+            --green: #00cc44;
+            --line: 4px;
+        }
+        body { font-family: 'Space Grotesk', sans-serif; background: var(--black); overflow-x: hidden; color: var(--white); }
+
+        /* SUPERPOSITION BACKGROUND */
+        .superposition-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 1;
+            background: #000000;
+        }
+        .superposition-bg svg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+        }
+        .superposition-bg .layer-baski {
+            opacity: 0.5;
+            z-index: 2;
+        }
+
+        /* === BASKI ANIMATIONS === */
+        .chaotic-line {
+            fill: none;
+            stroke-linecap: square;
+            stroke-linejoin: miter;
+            stroke-dasharray: 2500;
+            stroke-dashoffset: 2500;
+            animation: drawUndraw 7s cubic-bezier(0.4, 0, 0.2, 1) 1;
+        }
+        .line-yellow { stroke: #ffb700; stroke-width: 6; }
+        .line-blue { stroke: #0055ff; stroke-width: 5; }
+        .line-red { stroke: #ff0033; stroke-width: 4; }
+        .line-white { stroke: #ffffff; stroke-width: 4; }
+        .line-black { stroke: #111111; stroke-width: 8; }
+        .line-green { stroke: #00cc44; stroke-width: 5; }
+
+        .box-fill {
+            fill: #ff9900;
+            stroke: #000000;
+            stroke-width: 12;
+            opacity: 0;
+            animation: fadeInOut 7s ease-in-out 1;
+        }
+        .box-fill-blue {
+            fill: #0044cc;
+            stroke: #000000;
+            stroke-width: 12;
+            opacity: 0;
+            animation: fadeInOut 7s ease-in-out 1;
+        }
+
+        @keyframes drawUndraw {
+            0% { stroke-dashoffset: 2500; opacity: 0; }
+            15% { opacity: 1; }
+            50% { stroke-dashoffset: 0; opacity: 1; }
+            85% { opacity: 1; }
+            100% { stroke-dashoffset: -2500; opacity: 1; }
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: scale(0.95); }
+            25% { opacity: 0.9; transform: scale(1); }
+            50% { opacity: 0.95; transform: scale(1); }
+            75% { opacity: 0.9; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .d1 { animation-delay: 0s; }
+        .d2 { animation-delay: 0.4s; }
+        .d3 { animation-delay: 0.8s; }
+        .d4 { animation-delay: 1.2s; }
+        .d5 { animation-delay: 1.6s; }
+
+        /* CONTENT OVERLAY */
+        .content-overlay {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            background: rgba(17, 17, 17, 0.82);
+            backdrop-filter: blur(2px);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .content-overlay.is-visible {
+            opacity: 1;
+        }
+
+        /* HEADER */
+        .header {
+            display: grid;
+            grid-template-columns: 80px 1fr 80px;
+            gap: var(--line);
+        }
+        .header-l, .header-r {
+            background: var(--orange);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; font-weight: 700; color: var(--black); opacity: 0.6;
+        }
+        .header-r { background: var(--blue); }
+        .header-mid {
+            background: rgba(17, 17, 17, 0.92);
+            border-bottom: var(--line) solid var(--orange);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.5rem 2.5rem;
+        }
+        .logo { font-size: 0.85rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--white); }
+        .back-link {
+            font-size: 0.75rem; color: var(--white); text-decoration: none;
+            letter-spacing: 0.1em; text-transform: uppercase;
+            border-bottom: 2px solid var(--orange); padding-bottom: 2px;
+            transition: color 0.3s, border-color 0.3s;
+        }
+        .back-link:hover { color: var(--orange); border-color: var(--blue); }
+
+        /* MAIN */
+        .main {
+            display: grid;
+            grid-template-columns: 80px 1fr 80px;
+            gap: var(--line);
+        }
+        .side {
+            display: flex; align-items: center; justify-content: center;
+            writing-mode: vertical-lr;
+            font-size: 0.65rem; font-weight: 700; letter-spacing: 0.25em;
+            text-transform: uppercase; opacity: 0.3;
+        }
+        .side-l { background: var(--blue); }
+        .side-r { background: rgba(17, 17, 17, 0.92); border-left: var(--line) solid var(--orange); }
+        .content { padding: 6rem 3rem; }
+
+        /* HERO */
+        .hero { text-align: center; margin-bottom: 5rem; }
+        .hero-tag { font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--orange); margin-bottom: 1.5rem; display: block; }
+        .hero h1 { font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 700; line-height: 1.1; margin-bottom: 1.5rem; color: var(--white); }
+        .hero h1 em { font-style: normal; color: var(--orange); }
+        .hero-sub { font-size: 1rem; font-weight: 300; color: #aaa; max-width: 600px; margin: 0 auto; line-height: 1.7; }
+
+        /* BIO */
+        .bio {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--line);
+            max-width: 1000px;
+            margin: 0 auto 5rem;
+        }
+        .bio-art {
+            background: rgba(17, 17, 17, 0.9);
+            border: var(--line) solid var(--orange);
+            padding: 1rem;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .bio-art img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border: 2px solid var(--black);
+            filter: grayscale(1) contrast(1.1);
+        }
+        .bio-text {
+            background: rgba(17, 17, 17, 0.9);
+            border: var(--line) solid var(--blue);
+            padding: 3rem 2.5rem;
+        }
+        .bio-text h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--white); }
+        .bio-text h2 span { color: var(--orange); }
+        .bio-text p { font-size: 0.9rem; line-height: 1.8; color: #bbb; margin-bottom: 1rem; }
+        .bio-text p strong { color: var(--orange); }
+
+        /* FEATURED SECTION */
+        .featured-title { text-align: center; margin-bottom: 3rem; }
+        .featured-title h2 { font-size: 1.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--white); }
+        .featured-title h2 span { color: var(--orange); }
+        .featured-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--line);
+            max-width: 1000px;
+            margin: 0 auto 3rem;
+        }
+        .featured-item {
+            background: rgba(17, 17, 17, 0.9);
+            border: 6px solid var(--orange);
+            padding: 0.75rem;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+        .featured-item:hover { transform: translateY(-4px); border-color: var(--white); }
+        .featured-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border: 2px solid var(--black);
+        }
+        .featured-large {
+            grid-column: span 1;
+        }
+        .featured-large img {
+            aspect-ratio: 16/10;
+            object-fit: cover;
+        }
+
+        /* CATALOGO DESPLEGABLE */
+        .catalogo-desplegable {
+            max-width: 1000px;
+            margin: 0 auto 5rem;
+        }
+        .catalogo-toggle {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--orange);
+            cursor: pointer;
+            padding: 1rem 1.5rem;
+            border: 2px solid var(--orange);
+            background: rgba(17, 17, 17, 0.9);
+            text-align: center;
+            transition: all 0.3s;
+            list-style: none;
+            display: block;
+        }
+        .catalogo-toggle::-webkit-details-marker { display: none; }
+        .catalogo-toggle::before {
+            content: '+ ';
+            font-weight: 700;
+            color: var(--orange);
+        }
+        .catalogo-desplegable[open] .catalogo-toggle::before {
+            content: '- ';
+        }
+        .catalogo-toggle:hover { background: var(--orange); color: var(--black); }
+        .catalogo-chaotic {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            padding: 2rem 0;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .c-obra { width: 40%; transform: rotate(-2deg); border-color: var(--orange); }
+        .c-ignorance { width: 35%; transform: rotate(3deg); border-color: var(--red); }
+        .c1 { width: 28%; transform: rotate(-3deg); border-color: var(--red); }
+        .c2 { width: 22%; transform: rotate(2deg); margin-top: 3rem; border-color: var(--green); }
+        .c3 { width: 32%; transform: rotate(-1.5deg); border-color: var(--blue); }
+        .c4 { width: 18%; transform: rotate(4deg); margin-top: -1rem; border-color: var(--orange); }
+        .c5 { width: 26%; transform: rotate(-2.5deg); margin-top: 2rem; border-color: var(--red); }
+        .c6 { width: 35%; transform: rotate(1deg); border-color: var(--green); }
+        .c7 { width: 20%; transform: rotate(-4deg); margin-top: 4rem; border-color: var(--blue); }
+        .c8 { width: 30%; transform: rotate(3deg); border-color: var(--orange); }
+        .c9 { width: 24%; transform: rotate(-1deg); margin-top: -2rem; border-color: var(--red); }
+        .c10 { width: 28%; transform: rotate(2.5deg); margin-top: 1rem; border-color: var(--green); }
+        .c11 { width: 22%; transform: rotate(-3.5deg); border-color: var(--blue); }
+
+        .c-img {
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            cursor: pointer;
+            outline: none;
+        }
+        .c-img:focus, .c-img.active {
+            transform: rotate(0deg) !important;
+            box-shadow: 0 0 25px rgba(255, 183, 0, 0.6);
+            border-color: var(--orange) !important;
+            z-index: 10;
+            position: relative;
+        }
+
+        /* CONTACT */
+        .contact {
+            max-width: 1000px;
+            margin: 0 auto 5rem;
+            background: rgba(17, 17, 17, 0.9);
+            border: var(--line) solid var(--red);
+            padding: 3rem 2.5rem;
+            text-align: center;
+        }
+        .contact h2 { font-size: 1.4rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; color: var(--white); }
+        .contact h2 span { color: var(--orange); }
+        .contact p { font-size: 0.9rem; color: #888; line-height: 1.7; margin-bottom: 2rem; }
+        .contact-links { display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
+        .contact-links a {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--orange);
+            text-decoration: none;
+            color: var(--white);
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: all 0.3s;
+        }
+        .contact-links a:hover { background: var(--orange); color: var(--black); }
+
+        /* FOOTER */
+        .footer {
+            display: grid; grid-template-columns: 80px 1fr 80px;
+            gap: var(--line); margin-top: var(--line);
+        }
+        .footer-l { background: var(--orange); }
+        .footer-mid {
+            background: rgba(17, 17, 17, 0.92);
+            border-top: var(--line) solid var(--orange);
+            padding: 1.5rem; display: flex; justify-content: center; align-items: center;
+        }
+        .footer-r { background: var(--blue); }
+        .footer-text { font-size: 0.7rem; color: #888; letter-spacing: 0.1em; }
+
+        @media (max-width: 1024px) {
+            .header, .main, .footer { grid-template-columns: 1fr; }
+            .header-l, .header-r, .side, .footer-l, .footer-r { display: none; }
+            .content { padding: 4rem 2rem; }
+        }
+        @media (max-width: 768px) {
+            .bio { grid-template-columns: 1fr; }
+            .featured-grid { grid-template-columns: 1fr; }
+            .content { padding: 3rem 1.5rem; }
+            .c-img { width: 45% !important; }
+            body { font-size: 0.9rem; }
+            .back-link { padding: 0.75rem 0.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SUPERPOSITION BACKGROUND -->
+    <div class="superposition-bg">
+
+        <!-- BASKI LAYER (neo-expressionist) -->
+        <svg class="layer-baski" viewBox="0 0 1000 1250" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+            <rect width="1000" height="1250" fill="#000000"/>
+
+            <g>
+                <rect class="box-fill d1" x="30" y="30" width="220" height="280" />
+                <rect class="box-fill-blue d2" x="270" y="30" width="220" height="280" />
+                <rect class="box-fill d3" x="510" y="30" width="220" height="280" />
+                <rect class="box-fill-blue d4" x="750" y="30" width="220" height="280" />
+                <rect class="box-fill-blue d3" x="30" y="330" width="220" height="280" />
+                <rect class="box-fill d4" x="270" y="330" width="220" height="280" />
+                <rect class="box-fill-blue d1" x="510" y="330" width="220" height="280" />
+                <rect class="box-fill d2" x="750" y="330" width="220" height="280" />
+                <rect class="box-fill d2" x="30" y="630" width="220" height="280" />
+                <rect class="box-fill-blue d3" x="270" y="630" width="220" height="280" />
+                <rect class="box-fill d4" x="510" y="630" width="220" height="280" />
+                <rect class="box-fill-blue d1" x="750" y="630" width="220" height="280" />
+                <rect class="box-fill-blue d4" x="30" y="930" width="220" height="280" />
+                <rect class="box-fill d1" x="270" y="930" width="220" height="280" />
+                <rect class="box-fill-blue d2" x="510" y="930" width="220" height="280" />
+                <rect class="box-fill d3" x="750" y="930" width="220" height="280" />
+            </g>
+
+            <g>
+                <path class="chaotic-line line-black d1" d="M 250,20 L 250,1230 M 490,20 L 490,1230 M 730,20 L 730,1230" />
+                <path class="chaotic-line line-black d2" d="M 20,310 L 980,310 M 20,610 L 980,610 M 20,910 L 980,910" />
+                <path class="chaotic-line line-yellow d3" d="M 40,15 L 960,15 M 15,40 L 15,1210 M 985,40 L 985,1210 M 35,1235 L 970,1235" />
+
+                <g class="d1">
+                    <path class="chaotic-line line-white" d="M 60,70 Q 140,50 200,90 T 220,180 Q 210,250 140,260 T 70,200 Z" />
+                    <circle cx="95" cy="110" r="15" class="chaotic-line line-blue" />
+                    <circle cx="155" cy="110" r="15" class="chaotic-line line-blue" />
+                    <path class="chaotic-line line-red" d="M 80,210 L 200,210 M 90,210 L 90,240 M 110,210 L 110,240 M 130,210 L 130,240 M 150,210 L 150,240 M 170,210 L 170,240" />
+                </g>
+
+                <g class="d2">
+                    <path class="chaotic-line line-black" d="M 290,80 Q 360,50 440,90 T 470,170 Q 450,250 380,260 T 290,210 Z" />
+                    <circle cx="340" cy="120" r="16" class="chaotic-line line-yellow" />
+                    <circle cx="410" cy="120" r="16" class="chaotic-line line-yellow" />
+                    <path class="chaotic-line line-white" d="M 310,220 L 450,220 M 330,220 L 330,250 M 360,220 L 360,250 M 390,220 L 390,250 M 420,220 L 420,250" />
+                </g>
+
+                <g class="d3">
+                    <path class="chaotic-line line-white" d="M 530,60 Q 610,40 680,80 T 710,190 Q 690,250 610,270 T 540,210 Z" />
+                    <path class="chaotic-line line-red" d="M 565,100 L 595,130 M 595,100 L 565,130 M 635,100 L 665,130 M 665,100 L 635,130" />
+                    <path class="chaotic-line line-blue" d="M 550,220 L 690,220 M 570,220 L 570,260 M 610,220 L 610,260 M 650,220 L 650,260" />
+                </g>
+
+                <g class="d4">
+                    <path class="chaotic-line line-black" d="M 770,70 Q 860,60 940,100 T 960,190 Q 940,260 860,250 T 780,200 Z" />
+                    <path class="chaotic-line line-red" d="M 800,100 Q 850,80 900,120" />
+                    <path class="chaotic-line line-yellow" d="M 790,210 L 930,210 M 810,210 L 810,250 M 850,210 L 850,250 M 890,210 L 890,250" />
+                </g>
+
+                <g class="d5">
+                    <path class="chaotic-line line-white" d="M 50,380 Q 130,350 210,390 T 230,490 Q 210,560 140,570 T 60,500 Z" />
+                    <circle cx="100" cy="430" r="14" class="chaotic-line line-blue" />
+                    <circle cx="160" cy="430" r="14" class="chaotic-line line-blue" />
+                    <path class="chaotic-line line-green" d="M 70,510 L 210,510" />
+                </g>
+
+                <g class="d1">
+                    <path class="chaotic-line line-red" d="M 280,360 Q 370,340 450,390 T 470,490 Q 450,570 380,560 T 290,500 Z" />
+                    <path class="chaotic-line line-white" d="M 330,420 L 370,460 M 370,420 L 330,460" />
+                    <path class="chaotic-line line-yellow" d="M 310,520 L 440,520" />
+                </g>
+
+                <g class="d2">
+                    <path class="chaotic-line line-blue" d="M 520,370 Q 610,350 690,400 T 710,500 Q 690,580 610,570 T 530,510 Z" />
+                    <circle cx="570" cy="430" r="15" class="chaotic-line line-yellow" />
+                    <circle cx="640" cy="430" r="15" class="chaotic-line line-yellow" />
+                </g>
+
+                <g class="d3">
+                    <path class="chaotic-line line-white" d="M 780,380 Q 860,350 940,390 T 960,490 Q 940,570 870,560 T 790,500 Z" />
+                    <circle cx="830" cy="440" r="12" class="chaotic-line line-blue" />
+                    <circle cx="890" cy="440" r="12" class="chaotic-line line-blue" />
+                </g>
+
+                <path class="chaotic-line line-yellow d4" d="M 100,20 L 110,60 L 130,30 L 150,60 L 170,25 L 190,60 L 200,20" />
+                <path class="chaotic-line line-yellow d1" d="M 580,20 L 590,55 L 610,25 L 630,55 L 650,20" />
+                <path class="chaotic-line line-red d5" d="M 350,650 Q 500,680 650,650 T 950,670" />
+                <path class="chaotic-line line-blue d2" d="M 50,650 L 50,900 M 270,680 L 270,850 M 700,700 L 700,900" />
+                <path class="chaotic-line line-white d3" d="M 500,300 Q 550,400 500,500 T 520,700" />
+
+                <g class="d4">
+                    <path class="chaotic-line line-yellow" d="M 60,670 Q 140,650 200,690 T 220,780 Q 200,850 140,860 T 70,800 Z" />
+                    <path class="chaotic-line line-white" d="M 80,810 L 200,810" />
+                </g>
+
+                <g class="d5">
+                    <path class="chaotic-line line-white" d="M 300,670 Q 380,650 450,690 T 470,790 Q 450,860 380,850 T 300,790 Z" />
+                    <path class="chaotic-line line-red" d="M 320,810 L 450,810" />
+                </g>
+
+                <g class="d1">
+                    <path class="chaotic-line line-green" d="M 530,680 Q 610,660 690,700 T 710,800 Q 690,870 610,860 T 540,800 Z" />
+                </g>
+
+                <g class="d2">
+                    <path class="chaotic-line line-yellow" d="M 780,670 Q 860,650 940,690 T 960,790 Q 940,870 870,860 T 790,800 Z" />
+                </g>
+
+                <path class="chaotic-line line-red d3" d="M 30,950 L 230,1050 M 30,1050 L 230,950 M 270,980 L 470,980 M 520,950 L 700,1100" />
+                <path class="chaotic-line line-blue d4" d="M 760,950 Q 860,930 950,980 T 960,1100" />
+                <path class="chaotic-line line-white d5" d="M 800,1020 L 920,1020 M 830,1050 L 900,1050" />
+            </g>
+        </svg>
+
+    </div>
+
+    <!-- CONTENT OVERLAY -->
+    <div class="content-overlay" id="contentOverlay">
+        <div class="header">
+            <div class="header-l">C</div>
+            <div class="header-mid">
+                <div class="logo">Canaem Briceño</div>
+                <a href="index.html" class="back-link">← Volver</a>
+            </div>
+            <div class="header-r">CB</div>
+        </div>
+
+        <div class="main">
+            <div class="side side-l">INFORMACIÓN DEL ARTISTA</div>
+            <div class="content">
+
+                <!-- HERO -->
+                <section class="hero">
+                    <span class="hero-tag">Información del Artista</span>
+                    <h1>Canaem <em>Briceño</em></h1>
+                    <p class="hero-sub">Barcelona, 1993 · Práctica autodidacta · Pintura, dibujo, glitch art e instalación</p>
+                </section>
+
+                <!-- BIOGRAFÍA -->
+                <section class="bio">
+                    <div class="bio-art">
+                        <img src="presentacion/portrait.jpg" alt="Canaem Briceño">
+                    </div>
+                    <div class="bio-text">
+                        <h2>Biografía <span>·</span> Trayectoria</h2>
+                        <p><strong>Canaem Briceño</strong> (Barcelona, 1993) desarrolla una práctica autodidacta que transita entre la pintura, el dibujo, el glitch art y la instalación. Este desplazamiento entre medios no responde a una lógica de expansión formal, sino a la necesidad de tensionar los límites entre la materialidad tradicional y los procesos computacionales.</p>
+                        <p>Su investigación se centra en la <strong>ontología del error</strong>, entendiendo el glitch no como accidente, sino como manifestación primaria de un sistema en crisis. En este sentido, su producción se inscribe dentro de una tradición del arte digital que explora las interrupciones, los fallos y las distorsiones como formas de subversión estética y crítica.</p>
+                        <p>Con una práctica activa desde 2010 y presencia en exposiciones nacionales, incluyendo su paso por el <strong>M.A.C.C.A.R. en 2023</strong> bajo el seudónimo de <strong>Francisco Borsec</strong>, ha consolidado un cuerpo de trabajo que dialoga tanto con la tradición plástica como con las lógicas de la cultura digital contemporánea.</p>
+                        <p>En la obra de Canaem Briceño, el error no es una ruptura, sino una apertura. Allí donde el sistema falla, la imagen encuentra nuevas formas de existir.</p>
+                    </div>
+                </section>
+
+                <!-- OBRAS DESTACADAS -->
+                <section class="featured-title">
+                    <h2>Obras <span>·</span> Destacadas</h2>
+                </section>
+
+                <div class="featured-grid">
+                    <div class="featured-item featured-large">
+                        <img src="presentacion/habitacion1.jpg" alt="Instalación I">
+                    </div>
+                    <div class="featured-item featured-large">
+                        <img src="presentacion/habitacion 2.jpg" alt="Instalación II">
+                    </div>
+                    <div class="featured-item">
+                        <img src="presentacion/contemporaneo.jpg" alt="Contemporáneo I">
+                    </div>
+                    <div class="featured-item">
+                        <img src="presentacion/contemporaneo (2).jpg" alt="Contemporáneo II">
+                    </div>
+                </div>
+
+                <!-- CATÁLOGO DESPLEGABLE -->
+                <details class="catalogo-desplegable">
+                    <summary class="catalogo-toggle">Ver Catálogo Completo</summary>
+                    <div class="catalogo-chaotic">
+                        <img src="presentacion/obra.jpg" alt="" class="c-img c-obra" tabindex="0">
+                        <img src="presentacion/ignorance.jpg" alt="" class="c-img c-ignorance" tabindex="0">
+                        <img src="presentacion/_MG_1912-14.png" alt="" class="c-img c1" tabindex="0">
+                        <img src="presentacion/_MG_1892-1C.png" alt="" class="c-img c2" tabindex="0">
+                        <img src="presentacion/_MG_1911-13.png" alt="" class="c-img c3" tabindex="0">
+                        <img src="presentacion/_MG_1908-10.png" alt="" class="c-img c4" tabindex="0">
+                        <img src="presentacion/_MG_1906-9.png" alt="" class="c-img c5" tabindex="0">
+                        <img src="presentacion/_MG_1905-8C.png" alt="" class="c-img c6" tabindex="0">
+                        <img src="presentacion/_MG_1904-7.png" alt="" class="c-img c7" tabindex="0">
+                        <img src="presentacion/_MG_1903-6.png" alt="" class="c-img c8" tabindex="0">
+                        <img src="presentacion/_MG_1896-4.png" alt="" class="c-img c9" tabindex="0">
+                        <img src="presentacion/_MG_1895-3.png" alt="" class="c-img c10" tabindex="0">
+                        <img src="presentacion/_MG_1893-2.png" alt="" class="c-img c11" tabindex="0">
+                    </div>
+                </details>
+
+                <!-- CONTACTO -->
+                <section class="contact">
+                    <h2>Contacto <span>·</span> Redes</h2>
+                    <p>Para colaboraciones, encargos y presentaciones en vivo.</p>
+                    <div class="contact-links">
+                        <a href="https://resetgallery.com/categoria-producto/artistas/canaem-briceno/" target="_blank">Reset Gallery</a>
+                        <a href="https://franciscoborsec.tumblr.com/" target="_blank">Software</a>
+                        <a href="https://www.behance.net/franciscoborsec" target="_blank">Pintura</a>
+                    </div>
+                </section>
+
+            </div>
+            <div class="side side-r">PORCELANA + INMERSIÓN</div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-l"></div>
+            <div class="footer-mid"><span class="footer-text">© 2026 Canaem Briceño · Caracas, Venezuela</span></div>
+            <div class="footer-r"></div>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        var contentOverlay = document.getElementById('contentOverlay');
+        var played = sessionStorage.getItem('anim_artist');
+
+        function showContent() {
+            contentOverlay.classList.add('is-visible');
+            sessionStorage.setItem('anim_artist', '1');
+        }
+
+        if (played) {
+            document.documentElement.classList.add('no-anim');
+        }
+
+        window.addEventListener('pageshow', function(e) {
+            if (e.persisted || played) {
+                document.documentElement.classList.add('no-anim');
+                showContent();
+            }
+        });
+
+        if (played) {
+            showContent();
+        } else {
+            setTimeout(showContent, 1500);
+        }
+    })();
+    </script>
+
+    <script>
+    (function() {
+        var imgs = document.querySelectorAll('.c-img');
+        imgs.forEach(function(img) {
+            img.addEventListener('click', function() {
+                imgs.forEach(function(i) { i.classList.remove('active'); });
+                this.classList.add('active');
+            });
+        });
+    })();
+    </script>
+
+</body>
+</html>
