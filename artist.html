@@ -231,10 +231,10 @@
             background: rgba(17, 17, 17, 0.9);
             text-align: center;
             transition: all 0.3s;
-            list-style: none;
             display: block;
         }
         .catalogo-toggle::-webkit-details-marker { display: none; }
+        .catalogo-toggle::marker { display: none; content: ''; }
         .catalogo-toggle::before {
             content: '+ ';
             font-weight: 700;
@@ -587,6 +587,19 @@
                 this.classList.add('active');
             });
         });
+    })();
+    </script>
+
+    <script>
+    (function() {
+        var toggle = document.querySelector('.catalogo-toggle');
+        var details = document.querySelector('.catalogo-desplegable');
+        if (toggle && details) {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                details.open = !details.open;
+            });
+        }
     })();
     </script>
 
